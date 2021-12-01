@@ -3,20 +3,24 @@ export default function Budget({ budgets }) {
   return (
     <div className="bg-yellow-300 p-8 font-bold text-gray-800">
       <h1 className="text-4xl mb-8">Budget</h1>
-      <ul className="bg-yellow-100 p-4 rounded">
-        {budgets.map((budget, index) => (
-          <li className="mb-2" key={`${budget.category_id}_${String(index)}`}>
-            {budget.category_name}:{" "}
-            <span
-              className={
-                budget.rawAmount > 0 ? "text-green-500" : "text-red-500"
-              }
-            >
-              {budget.amount}
-            </span>
-          </li>
-        ))}
-      </ul>
+      {!budgets.length ? (
+        <p>hmm something is wrong</p>
+      ) : (
+        <ul className="bg-yellow-100 p-4 rounded">
+          {budgets.map((budget, index) => (
+            <li className="mb-2" key={`${budget.category_id}_${String(index)}`}>
+              {budget.category_name}:{" "}
+              <span
+                className={
+                  budget.rawAmount > 0 ? "text-green-500" : "text-red-500"
+                }
+              >
+                {budget.amount}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
@@ -33,6 +37,14 @@ export async function getStaticProps() {
     { headers }
   );
   const budgets = await res.json();
+
+  if (true || !budgets || !budgets.length) {
+    return {
+      props: {
+        budgets: [],
+      },
+    };
+  }
 
   const mappedBudgets = budgets.map((budget) => {
     if (
