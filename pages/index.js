@@ -54,32 +54,34 @@ export async function getServerSideProps({ query, req }) {
     };
   }
 
-  const mappedBudgets = budgets.map((budget) => {
-    if (
-      !budget.data ||
-      !budget.data[startDate] ||
-      !budget.data[startDate].budget_amount
-    ) {
+  const mappedBudgets = budgets
+    .map((budget) => {
+      if (
+        !budget.data ||
+        !budget.data[startDate] ||
+        !budget.data[startDate].budget_amount
+      ) {
+        return {
+          category_id: budget.category_id,
+          category_name: budget.category_name,
+          amount: 0,
+        };
+      }
+      const rawAmount =
+        budget.data[startDate].budget_amount -
+        budget.data[startDate].spending_to_base;
+      const amount = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+      }).format(rawAmount);
       return {
         category_id: budget.category_id,
         category_name: budget.category_name,
-        amount: 0,
+        rawAmount,
+        amount,
       };
-    }
-    const rawAmount =
-      budget.data[startDate].budget_amount -
-      budget.data[startDate].spending_to_base;
-    const amount = new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(rawAmount);
-    return {
-      category_id: budget.category_id,
-      category_name: budget.category_name,
-      rawAmount,
-      amount,
-    };
-  });
+    })
+    .filter((budget) => !!budget.amount);
   return {
     props: {
       budgets: mappedBudgets,
