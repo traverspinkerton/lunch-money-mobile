@@ -1,6 +1,11 @@
+import Head from "next/head";
+
 export default function Budget({ budgets, total }) {
   return (
     <div className="bg-yellow-300 p-8 font-bold text-gray-800 max-w-lg mx-auto">
+      <Head>
+        <title>Budget</title>
+      </Head>
       <h1 className="text-4xl font-black mb-8 text-yellow-600">Budget</h1>
       {!budgets.length ? (
         <p>hmm something is wrong</p>
