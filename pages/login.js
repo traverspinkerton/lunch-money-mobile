@@ -25,16 +25,3 @@ export default function Login() {
     </div>
   );
 }
-
-export async function getServerSideProps({ query, req }) {
-  // console.log({ query, cookies: req.cookies });
-  if (req.cookies.lm) {
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
-    };
-  }
-  return { props: {} };
-}
