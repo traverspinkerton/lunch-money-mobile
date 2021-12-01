@@ -5,6 +5,11 @@ export default function Budget({ budgets, total }) {
     <div className="bg-yellow-300 p-8 font-bold text-gray-800 max-w-lg mx-auto">
       <Head>
         <title>Budget</title>
+        <link
+          rel="apple-touch-icon"
+          sizes="128x128"
+          href="/apple-touch-icon.png"
+        ></link>
       </Head>
       <h1 className="text-4xl font-black mb-8 text-yellow-600">Budget</h1>
       {!budgets.length ? (
