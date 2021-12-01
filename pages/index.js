@@ -1,5 +1,4 @@
 export default function Budget({ budgets }) {
-  console.log(budgets);
   return (
     <div className="bg-yellow-300 p-8 font-bold text-gray-800">
       <h1 className="text-4xl mb-8">Budget</h1>
@@ -38,7 +37,7 @@ export async function getStaticProps() {
   );
   const budgets = await res.json();
 
-  if (true || !budgets || !budgets.length) {
+  if (!budgets || !budgets.length) {
     return {
       props: {
         budgets: [],
