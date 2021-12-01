@@ -24,7 +24,16 @@ export default function Budget({ budgets }) {
   );
 }
 
-export async function getStaticProps() {
+export async function getServerSideProps({ query, req }) {
+  console.log({ cookie: req.cookies.lm_secret });
+  if (req.cookies.lm_secret !== "PinkertonBudget2021!") {
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
+  }
   const headers = new Headers();
   headers.set("Authorization", `Bearer ${process.env.LM_TOKEN}`);
 
