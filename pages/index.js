@@ -49,7 +49,7 @@ export default function Budget({ budgets, total }) {
 }
 
 export async function getServerSideProps({ req }) {
-  if (req.cookies.lm_secret !== "PinkertonBudget2021!") {
+  if (req.cookies.lm_secret !== process.env.secret) {
     return {
       redirect: {
         destination: "/login",
