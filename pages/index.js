@@ -11,7 +11,11 @@ export default function Budget({ budgets, total }) {
           href="/apple-touch-icon.png"
         ></link>
       </Head>
-      <h1 className="text-4xl font-black mb-8 text-yellow-600">Budget</h1>
+      <h1 className="text-4xl font-black mb-4 text-yellow-600">Budget</h1>
+      {/* <select className="rounded w-full mb-4">
+        <option value={11}>December</option>
+        {['Jan', 'Feb', 'March'].map(month => <option>)}
+      </select> */}
       {!budgets.length ? (
         <p>hmm something is wrong</p>
       ) : (
@@ -56,8 +60,8 @@ export async function getServerSideProps({ req }) {
   const headers = new Headers();
   headers.set("Authorization", `Bearer ${process.env.LM_TOKEN}`);
 
-  const startDate = "2021-11-01";
-  const endDate = "2021-11-30";
+  const startDate = "2021-12-01";
+  const endDate = "2021-12-31";
 
   const res = await fetch(
     `https://dev.lunchmoney.app/v1/budgets?start_date=${startDate}&end_date=${endDate}`,
