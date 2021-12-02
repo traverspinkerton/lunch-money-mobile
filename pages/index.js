@@ -49,7 +49,7 @@ export default function Budget({ budgets, total }) {
 }
 
 export async function getServerSideProps({ req }) {
-  if (req.cookies.lm_secret !== process.env.secret) {
+  if (req.cookies.lm_secret !== process.env.SECRET) {
     return {
       redirect: {
         destination: "/login",
