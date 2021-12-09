@@ -1,6 +1,23 @@
 import Head from "next/head";
+import { useState } from "react";
+import { getBudgetsForMonth } from "../lib/lm-api";
 
 export default function Budget({ budgets, total }) {
+  const [month, setMonht] = useState();
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
   return (
     <div className="bg-yellow-300 p-8 font-bold text-gray-800 max-w-lg mx-auto">
       <Head>
@@ -12,10 +29,19 @@ export default function Budget({ budgets, total }) {
         ></link>
       </Head>
       <h1 className="text-4xl font-black mb-4 text-yellow-600">Budget</h1>
-      {/* <select className="rounded w-full mb-4">
-        <option value={11}>December</option>
-        {['Jan', 'Feb', 'March'].map(month => <option>)}
-      </select> */}
+      <form>
+        <select name="month" className="rounded w-full mb-4">
+          {months.map((month, index) => (
+            <option
+              key={month}
+              onChange={() => window.location("/?month=" + index)}
+              label={month}
+              value={index}
+              selected={index === new Date().getMonth()}
+            />
+          ))}
+        </select>
+      </form>
       {!budgets.length ? (
         <p>hmm something is wrong</p>
       ) : (
@@ -28,7 +54,9 @@ export default function Budget({ budgets, total }) {
               {budget.category_name}:{" "}
               <span
                 className={
-                  budget.rawAmount > 0 ? "text-green-500" : "text-red-500"
+                  Number(budget.amount.slice(1)) > 0
+                    ? "text-green-500"
+                    : "text-red-500"
                 }
               >
                 {budget.amount}
@@ -48,7 +76,7 @@ export default function Budget({ budgets, total }) {
   );
 }
 
-export async function getServerSideProps({ req }) {
+export async function getServerSideProps({ req, params }) {
   if (req.cookies.lm_secret !== process.env.SECRET) {
     return {
       redirect: {
@@ -57,73 +85,13 @@ export async function getServerSideProps({ req }) {
       },
     };
   }
-  const headers = new Headers();
-  headers.set("Authorization", `Bearer ${process.env.LM_TOKEN}`);
 
-  const startDate = "2021-12-01";
-  const endDate = "2021-12-31";
-
-  const res = await fetch(
-    `https://dev.lunchmoney.app/v1/budgets?start_date=${startDate}&end_date=${endDate}`,
-    { headers }
-  );
-  const budgets = await res.json();
-
-  if (!budgets || !budgets.length) {
-    return {
-      props: {
-        budgets: [],
-      },
-    };
-  }
-
-  const mappedBudgets = budgets
-    .map((budget) => {
-      if (
-        !budget.data ||
-        !budget.data[startDate] ||
-        !budget.data[startDate].budget_amount
-      ) {
-        return {
-          category_id: budget.category_id,
-          category_name: budget.category_name,
-          amount: 0,
-        };
-      }
-      const rawAmount =
-        budget.data[startDate].budget_amount -
-        budget.data[startDate].spending_to_base;
-      const amount = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(rawAmount);
-      return {
-        category_id: budget.category_id,
-        category_name: budget.category_name,
-        rawAmount,
-        amount,
-        spent: budget.data[startDate].spending_to_base,
-        budgeted: budget.data[startDate].budget_amount,
-      };
-    })
-    .filter((budget) => !!budget.amount);
-
-  const total = mappedBudgets.reduce(
-    (budget, totalSoFar) => {
-      return {
-        budgeted: totalSoFar.budgeted + budget.budgeted,
-        spent: totalSoFar.spent + budget.spent,
-      };
-    },
-    {
-      budgeted: 0,
-      spent: 0,
-    }
-  );
+  const todaysMonth = new Date().getMonth();
+  const { budgets, total } = await getBudgetsForMonth();
 
   return {
     props: {
-      budgets: mappedBudgets,
+      budgets,
       total,
     },
   };
