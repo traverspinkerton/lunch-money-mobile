@@ -37,34 +37,42 @@ export async function getBudgetsForMonth(): Promise<BudgetData> {
   }
 
   const mappedBudgets = budgets
-    .map((budget) => {
-      if (
-        !budget.data ||
-        !budget.data[startDate] ||
-        !budget.data[startDate].budget_amount
-      ) {
+    .map(
+      (budget: {
+        data: {
+          [x: string]: { budget_amount: number; spending_to_base: number };
+        };
+        category_id: number;
+        category_name: string;
+      }) => {
+        if (
+          !budget.data ||
+          !budget.data[startDate] ||
+          !budget.data[startDate].budget_amount
+        ) {
+          return {
+            category_id: budget.category_id,
+            category_name: budget.category_name,
+            amount: 0,
+          };
+        }
+        const rawAmount =
+          budget.data[startDate].budget_amount -
+          budget.data[startDate].spending_to_base;
+        const amount = new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "USD",
+        }).format(rawAmount);
         return {
           category_id: budget.category_id,
           category_name: budget.category_name,
-          amount: 0,
+          // rawAmount,
+          amount,
+          spent: budget.data[startDate].spending_to_base,
+          budgeted: budget.data[startDate].budget_amount,
         };
       }
-      const rawAmount =
-        budget.data[startDate].budget_amount -
-        budget.data[startDate].spending_to_base;
-      const amount = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(rawAmount);
-      return {
-        category_id: budget.category_id,
-        category_name: budget.category_name,
-        // rawAmount,
-        amount,
-        spent: budget.data[startDate].spending_to_base,
-        budgeted: budget.data[startDate].budget_amount,
-      };
-    })
+    )
     .filter((budget: Budget) => !!budget.amount);
 
   const total = mappedBudgets.reduce(
