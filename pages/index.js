@@ -1,23 +1,7 @@
 import Head from "next/head";
-import { useState } from "react";
 import { getBudgetsForMonth } from "../lib/lm-api";
 
 export default function Budget({ budgets, total }) {
-  const [month, setMonht] = useState();
-  const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
   return (
     <div className="bg-yellow-300 p-8 font-bold text-gray-800 max-w-lg mx-auto">
       <Head>
@@ -29,19 +13,6 @@ export default function Budget({ budgets, total }) {
         ></link>
       </Head>
       <h1 className="text-4xl font-black mb-4 text-yellow-600">Budget</h1>
-      <form>
-        <select name="month" className="rounded w-full mb-4">
-          {months.map((month, index) => (
-            <option
-              key={month}
-              onChange={() => window.location("/?month=" + index)}
-              label={month}
-              value={index}
-              selected={index === new Date().getMonth()}
-            />
-          ))}
-        </select>
-      </form>
       {!budgets.length ? (
         <p>hmm something is wrong</p>
       ) : (
@@ -65,27 +36,41 @@ export default function Budget({ budgets, total }) {
           ))}
         </ul>
       )}
-      {/* <p>Budgeted: {total.budgeted}</p>
-      <p>Spent: {total.spent}</p>
-      <p>
-        {total.budgeted > total.spent
-          ? `${total.spent - total.budgeted} over budget`
-          : `${total.budgeted - total.spent} under budget`}
-      </p> */}
+      <h3 className="text-2xl font-black my-4 text-yellow-600">Total</h3>
+      <li className="mb-2 p-2 rounded shadow-sm bg-yellow-100 flex justify-between">
+        Budgeted:
+        <span>
+          {new Intl.NumberFormat("en-US", {
+            style: "currency",
+            currency: "USD",
+          }).format(total.budgeted)}
+        </span>
+      </li>
+      <li className="mb-2 p-2 rounded shadow-sm bg-yellow-100 flex justify-between">
+        Spent:
+        <span>
+          {new Intl.NumberFormat("en-US", {
+            style: "currency",
+            currency: "USD",
+          }).format(total.spent)}
+        </span>
+      </li>
+      <li className="mb-2 p-2 rounded shadow-sm bg-yellow-100 flex justify-between">
+        {total.spent > total.budgeted
+          ? `${new Intl.NumberFormat("en-US", {
+              style: "currency",
+              currency: "USD",
+            }).format(total.spent - total.budgeted)} over budget`
+          : `${new Intl.NumberFormat("en-US", {
+              style: "currency",
+              currency: "USD",
+            }).format(total.budgeted - total.spent)} under budget`}
+      </li>
     </div>
   );
 }
 
-export async function getServerSideProps({ req, params }) {
-  if (req.cookies.lm_secret !== process.env.SECRET) {
-    return {
-      redirect: {
-        destination: "/login",
-        permanent: false,
-      },
-    };
-  }
-
+export async function getStaticProps() {
   const todaysMonth = new Date().getMonth();
   const { budgets, total } = await getBudgetsForMonth();
 
