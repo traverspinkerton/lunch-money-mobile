@@ -79,5 +79,6 @@ export async function getStaticProps() {
       budgets,
       total,
     },
+    revalidate: 1,
   };
 }
